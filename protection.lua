@@ -2,7 +2,8 @@ landrush.offense = {}
 
 function landrush.can_interact(pos, name)
 
-	if ( pos.y < -200 or name == '' or name == nil ) then
+	--if ( pos.y < -200 or name == '' or name == nil ) then
+	if ( name == '' or name == nil ) then
 		return true
 	end
 
@@ -17,8 +18,8 @@ function landrush.can_interact(pos, name)
 			return true
 		end
 	end
-	
-	
+
+
 	-- return landrush.claims[chunk] == nil or landrush.claims[chunk].owner == name or landrush.claims[chunk].shared[name]
 	if ( landrush.claims[chunk] == nil ) then
 		if ( landrush.config:get_bool("requireClaim") == true ) then
@@ -28,7 +29,7 @@ function landrush.can_interact(pos, name)
 		end
 	end
 
-	-- see if the owner is offline, and area is not shared then it's off limits	
+	-- see if the owner is offline, and area is not shared then it's off limits
 	if ( landrush.claims[chunk].owner ~= name and landrush.config:get_bool("onlineProtection") == false ) then
 		if ( minetest.get_player_by_name(owner) ~= nil ) then
 			minetest.chat_send_player( landrush.claims[chunk].owner, "You are being griefed by "..name.." at "..minetest.pos_to_string(pos) )
@@ -44,9 +45,9 @@ function landrush.can_interact(pos, name)
 	return landrush.claims[chunk].owner == name or landrush.claims[chunk].shared[name]
 end
 
-function landrush.do_autoban(pos,name) 
+function landrush.do_autoban(pos,name)
 	-- moved this to it's own function so landrush.protection_violation is a little cleaner, and this could be overwritten as well
-	
+
 	if ( landrush.offense[name] == nil ) then
 			landrush.offense[name] = {count=0,lastpos=nil,lasttime=os.time(),bancount=0}
 		end
@@ -109,27 +110,27 @@ end
 function landrush.protection_violation(pos,name)
 	-- this function can be overwritten to apply whatever discipline the server admin wants
 	-- this is the default discipline
-	
+
 	local player = minetest.get_player_by_name(name)
-	
+
 	if ( player == nil ) then
 	  return
 	end
-	
+
 	local owner = landrush.get_owner(pos)
-	
+
 	if ( landrush.config:get_bool("requireClaim") == true ) then
 		if ( owner == nil ) then
 			minetest.chat_send_player(name,"This area is unowned, but you must claim it to build or mine")
 			return true
-		end	
+		end
 	end
-	
+
 	minetest.chat_send_player(name, "Area owned by "..tostring(owner).." stop trying to dig here!")
 	if ( tonumber(landrush.config:get("noDamageTime")) > landrush.get_timeonline(name) ) then
 		player:set_hp( player:get_hp() - landrush.config:get("offenseDamage") )
 	end
-	
+
 	if ( landrush.config:get_bool("autoBan") == true ) then
 		if ( tonumber(landrush.config:get("noBanTime")) > landrush.get_timeonline(name) ) then
 			landrush.do_autoban(pos,name)
@@ -195,4 +196,3 @@ function minetest.item_place(itemstack, placer, pointed_thing)
 		end
 	end
 end
-

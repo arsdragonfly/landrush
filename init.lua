@@ -37,12 +37,15 @@ landrush.load_claims()
 				minetest.chat_send_player(player,"Guests cannot claim land")
 				return itemstack
 			end
-			
+
+			-- for whole block protection
+			--[[
 			if ( pointed_thing.above.y < -200 ) then
 				minetest.chat_send_player(player,"You cannot claim below -200")
 				return itemstack
 			end
-			
+			]]--
+
 			if owner then
 				minetest.chat_send_player(player, "This area is already owned by "..owner)
 			else
